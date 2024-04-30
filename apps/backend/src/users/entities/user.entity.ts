@@ -11,7 +11,7 @@ export class User {
   credential: UserCredential
 
   @Prop({ type: UserProfile, default: null })
-  profile?: UserProfile
+  profile: UserProfile
 
   @Prop({ default: randomUUID })
   _id?: string

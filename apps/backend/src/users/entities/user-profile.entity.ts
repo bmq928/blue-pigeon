@@ -5,6 +5,12 @@ export type UserProfileDocument = UserProfile & Document
 @Schema({ _id: false, timestamps: true })
 export class UserProfile {
   @Prop()
+  firstName: string
+
+  @Prop()
+  lastName: string
+
+  @Prop()
   createdAt?: Date
 
   @Prop()

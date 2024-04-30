@@ -86,6 +86,10 @@ export class UsersService {
         email: registerDto.email,
         password: await this.hash(registerDto.password),
       },
+      profile: {
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
+      },
     }).save()
 
     return {

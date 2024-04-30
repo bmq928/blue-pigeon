@@ -1,18 +1,26 @@
+import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose'
+import redisStore from 'cache-manager-redis-store'
 import * as joi from 'joi'
+import { RedisClientOptions } from 'redis'
 import {
+  CACHE_CONFIG_TOKEN,
+  CacheConfig,
   JWT_CONFIG_TOKEN,
   JwtConfig,
   baseConfig,
   baseConfigSchema,
+  cacheConfig,
+  cacheConfigSchema,
   jwtConfig,
   jwtConfigSchema,
   pbkdf2Config,
   pbkdf2ConfigSchema,
 } from './config'
+import { mailerConfig, mailerConfigSchema } from './config/mailer.config'
 import {
   MONGO_CONFIG_TOKEN,
   MongoConfig,
@@ -26,13 +34,22 @@ import { UsersModule } from './users/users.module'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [baseConfig, mongoConfig, jwtConfig, pbkdf2Config],
+      load: [
+        baseConfig,
+        mongoConfig,
+        jwtConfig,
+        pbkdf2Config,
+        cacheConfig,
+        mailerConfig,
+      ],
       validationSchema: joi
         .object()
         .concat(baseConfigSchema)
         .concat(mongoConfigSchema)
         .concat(jwtConfigSchema)
-        .concat(pbkdf2ConfigSchema),
+        .concat(pbkdf2ConfigSchema)
+        .concat(cacheConfigSchema)
+        .concat(mailerConfigSchema),
     }),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
@@ -58,6 +75,19 @@ import { UsersModule } from './users/users.module'
         }
       },
       inject: [ConfigService],
+    }),
+    CacheModule.registerAsync<RedisClientOptions>({
+      useFactory: (configService: ConfigService) => {
+        const conf = configService.get<CacheConfig>(CACHE_CONFIG_TOKEN)
+
+        return {
+          store: redisStore as any,
+          host: conf.redis.host,
+          port: conf.redis.port,
+        }
+      },
+      inject: [ConfigService],
+      isGlobal: true,
     }),
     UsersModule,
     PostsModule,

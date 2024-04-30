@@ -4,13 +4,10 @@ import { UserProfile } from './entities/user-profile.entity'
 import { User } from './entities/user.entity'
 
 export class UserCredentialResponse implements UserCredential {
-  email: string
-
   @Exclude()
   password: string
-
+  email: string
   createdAt: Date
-
   updatedAt: Date
 }
 
@@ -22,4 +19,8 @@ export class UserResponse implements User {
 
 export class UserAuthTokenResponse {
   accessToken: string
+}
+
+export class UserRegisterResponse {
+  message: string
 }

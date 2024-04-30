@@ -6,7 +6,6 @@ export interface BaseConfig {
   host: string
   nodeEnv: string
   basePath: string
-  version: string
 }
 
 export const BASE_CONFIG_TOKEN = 'base'
@@ -18,7 +17,6 @@ export const baseConfig = registerAs(
     host: process.env['HOST'] ?? '0.0.0.0',
     nodeEnv: process.env['NODE_ENV'] ?? 'development',
     basePath: process.env['BASE_PATH'] ?? '/',
-    version: '0.0.1', //FIXME: find a way to avoid hardcoded
   }),
 )
 

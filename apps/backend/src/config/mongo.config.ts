@@ -23,7 +23,7 @@ export const mongoConfig = registerAs(
 )
 
 export const mongoConfigSchema = joi.object({
-  MONGO_PORT: joi.number().default(27017),
+  MONGO_PORT: joi.number().port().default(27017),
   MONGO_HOST: joi.string().hostname().default('0.0.0.0'),
   MONGO_DATABASE: joi.string().required(),
   MONGO_USERNAME: joi.string().required(),

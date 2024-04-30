@@ -1,16 +1,30 @@
-import { Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
+import { plainToInstance } from 'class-transformer'
+import { RegisterDto } from './dto'
+import { UserAuthTokenResponse } from './users.response'
+import { UsersService } from './users.service'
 
 @Controller('users')
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
   @Post('/register')
-  register() {}
+  register(@Body() dto: RegisterDto): Promise<UserAuthTokenResponse> {
+    return this.usersService
+      .register(dto)
+      .then((r) => plainToInstance(UserAuthTokenResponse, r))
+  }
 
   @Post('/login')
-  login() {}
+  login(@Body() dto: RegisterDto): Promise<UserAuthTokenResponse> {
+    return this.usersService
+      .login(dto)
+      .then((r) => plainToInstance(UserAuthTokenResponse, r))
+  }
 
-  @Post('/email/verify')
-  verifyEmail() {}
+  // @Post('/email/verify')
+  // verifyEmail() {}
 
-  @Post('/profile')
-  setupProfile() {}
+  // @Post('/profile')
+  // setupProfile() {}
 }

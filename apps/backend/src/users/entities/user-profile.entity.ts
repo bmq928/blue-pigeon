@@ -4,13 +4,11 @@ export type UserProfileDocument = UserProfile & Document
 
 @Schema({ _id: false, timestamps: true })
 export class UserProfile {
-  // auto generated
   @Prop()
-  createdAt?: number
+  createdAt?: Date
 
-  // auto generated
   @Prop()
-  updatedAt?: number
+  updatedAt?: Date
 }
 
 export const UserProfileSchema = SchemaFactory.createForClass(UserProfile)

@@ -13,17 +13,14 @@ export class User {
   @Prop({ type: UserProfile, default: null })
   profile?: UserProfile
 
-  // auto generated
   @Prop({ default: randomUUID })
   _id?: string
 
-  // auto generated
   @Prop()
-  createdAt?: number
+  createdAt?: Date
 
-  // auto generated
   @Prop()
-  updatedAt?: number
+  updatedAt?: Date
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

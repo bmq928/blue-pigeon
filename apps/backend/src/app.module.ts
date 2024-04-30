@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose'
-import redisStore from 'cache-manager-redis-store'
+import redisStore from 'cache-manager-ioredis'
 import * as joi from 'joi'
 import { RedisClientOptions } from 'redis'
 import {
@@ -81,7 +81,7 @@ import { UsersModule } from './users/users.module'
         const conf = configService.get<CacheConfig>(CACHE_CONFIG_TOKEN)
 
         return {
-          store: redisStore as any,
+          store: redisStore,
           host: conf.redis.host,
           port: conf.redis.port,
         }

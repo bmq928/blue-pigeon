@@ -32,6 +32,6 @@ export const cacheConfig = registerAs(
 export const cacheConfigSchema = joi.object({
   CACHE_REDIS_PORT: joi.number().port().default(6379),
   CACHE_REDIS_HOST: joi.string().hostname().default('localhost'),
-  CACHE_REGISTER_KEY_TTL: joi.number().integer().default(600000),
+  CACHE_REGISTER_KEY_TTL: joi.number().integer().default(60000000),
   CACHE_REGISTER_KEY_PREFIX: joi.string().default('register-verify-prefix'),
 })

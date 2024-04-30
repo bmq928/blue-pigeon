@@ -10,14 +10,20 @@ import { ConfigType } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { InjectModel } from '@nestjs/mongoose'
 import { Cache } from 'cache-manager'
+import { isNotEmpty } from 'class-validator'
 import type { Model } from 'mongoose'
 import * as crypto from 'node:crypto'
 import { cacheConfig, pbkdf2Config } from '../config'
 import { MailerService } from '../mailer/mailer.service'
 import { LoginDto, RegisterDto } from './dto'
+import { SetupProfileDto } from './dto/setup-profile.dto'
 import { VerifyRegisterDto } from './dto/verify-register.dto'
 import { User, UserDocument } from './entities'
-import { UserAuthTokenResponse, UserRegisterResponse } from './users.response'
+import {
+  UserAuthTokenResponse,
+  UserRegisterResponse,
+  UserResponse,
+} from './users.response'
 
 @Injectable()
 export class UsersService {
@@ -43,8 +49,9 @@ export class UsersService {
       throw new BadRequestException([`email ${dto.email} is existed`])
 
     const randomKey = crypto.randomUUID()
+    const cacheKey = `${this.cacheConf.register.prefix}-${randomKey}`
     await this.cacheManger.set(
-      `${this.cacheConf.register}-${randomKey}`,
+      cacheKey,
       JSON.stringify(dto),
       this.cacheConf.register.ttl,
     )
@@ -75,8 +82,8 @@ export class UsersService {
   }
 
   async verifyRegister(dto: VerifyRegisterDto): Promise<UserAuthTokenResponse> {
-    const cacheKey = `${this.cacheConf.register}-${dto.key}`
-    const registerDtoRaw: string = await this.cacheManger.get(cacheKey)
+    const cacheKey = `${this.cacheConf.register.prefix}-${dto.key}`
+    const registerDtoRaw = await this.cacheManger.get<string>(cacheKey)
     await this.cacheManger.del(cacheKey)
     if (!registerDtoRaw) throw new NotFoundException(['key is not existed'])
 
@@ -98,6 +105,30 @@ export class UsersService {
         email: created.credential.email,
       }),
     }
+  }
+
+  async setupProfile(
+    userId: string,
+    dto: SetupProfileDto,
+  ): Promise<UserResponse> {
+    const updateProfileQuery = Object.entries(dto)
+      .filter(([, val]) => isNotEmpty(val))
+      .reduce(
+        (acc, [key, val]) => ({
+          ...acc,
+          [`profile.${key}`]: val,
+        }),
+        {},
+      )
+    return this.userModel
+      .findByIdAndUpdate(
+        userId,
+        {
+          $set: updateProfileQuery,
+        },
+        { returnDocument: 'after' },
+      )
+      .lean()
   }
 
   private hash(raw: string): Promise<string> {

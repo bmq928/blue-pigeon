@@ -14,7 +14,7 @@ export class UserCredentialResponse implements UserCredential {
 export class UserResponse implements User {
   _id: string
   credential: UserCredentialResponse
-  profile?: UserProfile
+  profile: UserProfile
 }
 
 export class UserAuthTokenResponse {

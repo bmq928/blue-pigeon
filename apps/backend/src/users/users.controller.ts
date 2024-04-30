@@ -1,8 +1,22 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { RegisterDto } from './dto'
+import { SetupProfileDto } from './dto/setup-profile.dto'
 import { VerifyRegisterDto } from './dto/verify-register.dto'
-import { UserAuthTokenResponse, UserRegisterResponse } from './users.response'
+import { AuthGuard, AuthUserId } from './users.guard'
+import {
+  UserAuthTokenResponse,
+  UserRegisterResponse,
+  UserResponse,
+} from './users.response'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -32,6 +46,14 @@ export class UsersController {
       .then((r) => plainToInstance(UserAuthTokenResponse, r))
   }
 
-  // @Post('/profile')
-  // setupProfile() {}
+  @UseGuards(AuthGuard)
+  @Put('/profile')
+  setupProfile(
+    @AuthUserId() userId: string,
+    @Body() dto: SetupProfileDto,
+  ): Promise<UserResponse> {
+    return this.usersService
+      .setupProfile(userId, dto)
+      .then((r) => plainToInstance(UserResponse, r))
+  }
 }

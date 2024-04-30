@@ -7,7 +7,9 @@ import {
 import { UserCredential } from '../entities'
 import { UserProfile } from '../entities/user-profile.entity'
 
-export class RegisterDto implements UserCredential, UserProfile {
+export class RegisterDto
+  implements UserCredential, Pick<UserProfile, 'firstName' | 'lastName'>
+{
   @IsEmail()
   email: string
 

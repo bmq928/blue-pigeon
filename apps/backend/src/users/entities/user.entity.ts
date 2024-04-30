@@ -13,6 +13,9 @@ export class User {
   @Prop({ type: UserProfile, default: null })
   profile: UserProfile
 
+  @Prop({ default: [] })
+  friendIds: string[] = []
+
   @Prop({ default: randomUUID })
   _id?: string
 
@@ -21,6 +24,15 @@ export class User {
 
   @Prop()
   updatedAt?: Date
+
+  // populate
+  friends?: User[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
+UserSchema.virtual('friends', {
+  ref: User.name,
+  localField: '_id',
+  foreignField: 'friendIds',
+  justOne: false,
+})

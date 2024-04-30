@@ -15,6 +15,8 @@ export class UserResponse implements User {
   _id: string
   credential: UserCredentialResponse
   profile: UserProfile
+  friendIds: string[]
+  friends?: UserResponse[]
 }
 
 export class UserAuthTokenResponse {

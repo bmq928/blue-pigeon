@@ -52,7 +52,7 @@ export class UsersService {
     const cacheKey = `${this.cacheConf.register.prefix}-${randomKey}`
     await this.cacheManger.set(
       cacheKey,
-      JSON.stringify(dto),
+      JSON.stringify({ ...dto, password: await this.hash(dto.password) }),
       this.cacheConf.register.ttl,
     )
     await this.mailerService.send({
@@ -91,7 +91,7 @@ export class UsersService {
     const created = await new this.userModel({
       credential: {
         email: registerDto.email,
-        password: await this.hash(registerDto.password),
+        password: registerDto.password,
       },
       profile: {
         firstName: registerDto.firstName,
@@ -120,6 +120,7 @@ export class UsersService {
         }),
         {},
       )
+
     return this.userModel
       .findByIdAndUpdate(
         userId,
@@ -129,6 +130,29 @@ export class UsersService {
         { returnDocument: 'after' },
       )
       .lean()
+  }
+
+  async addFriends(userId: string, friendId: string): Promise<UserResponse> {
+    const session = await this.userModel.startSession()
+    const updated = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        {
+          $addToSet: {
+            friendIds: friendId,
+          },
+        },
+        { session, returnDocument: 'after' },
+      )
+      .lean()
+    await this.userModel.findByIdAndUpdate(
+      friendId,
+      { $addToSet: { friendIds: userId } },
+      { session },
+    )
+    await session.endSession()
+
+    return updated as UserResponse
   }
 
   private hash(raw: string): Promise<string> {

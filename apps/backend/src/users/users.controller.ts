@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { RegisterDto } from './dto'
+import { VerifyRegisterDto } from './dto/verify-register.dto'
 import { UserAuthTokenResponse, UserRegisterResponse } from './users.response'
 import { UsersService } from './users.service'
 
@@ -22,8 +23,14 @@ export class UsersController {
       .then((r) => plainToInstance(UserAuthTokenResponse, r))
   }
 
-  // @Post('/email/verify')
-  // verifyEmail() {}
+  @Get('/email/verify/:key')
+  verifyRegister(
+    @Param() param: VerifyRegisterDto,
+  ): Promise<UserAuthTokenResponse> {
+    return this.usersService
+      .verifyRegister(param)
+      .then((r) => plainToInstance(UserAuthTokenResponse, r))
+  }
 
   // @Post('/profile')
   // setupProfile() {}

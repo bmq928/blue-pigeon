@@ -15,6 +15,7 @@ import * as crypto from 'node:crypto'
 import { cacheConfig, pbkdf2Config } from '../config'
 import { MailerService } from '../mailer/mailer.service'
 import { LoginDto, RegisterDto } from './dto'
+import { VerifyRegisterDto } from './dto/verify-register.dto'
 import { User, UserDocument } from './entities'
 import { UserAuthTokenResponse, UserRegisterResponse } from './users.response'
 
@@ -65,14 +66,32 @@ export class UsersService {
 
     if (!existed) throw new NotFoundException([`email or password is wrong`])
 
+    return {
+      accessToken: this.jwtService.sign({
+        _id: existed._id,
+        email: existed.credential.email,
+      }),
+    }
+  }
+
+  async verifyRegister(dto: VerifyRegisterDto): Promise<UserAuthTokenResponse> {
+    const cacheKey = `${this.cacheConf.register}-${dto.key}`
+    const registerDtoRaw: string = await this.cacheManger.get(cacheKey)
+    await this.cacheManger.del(cacheKey)
+    if (!registerDtoRaw) throw new NotFoundException(['key is not existed'])
+
+    const registerDto: RegisterDto = JSON.parse(registerDtoRaw)
     const created = await new this.userModel({
-      credential: { email: dto.email, password: await this.hash(dto.password) },
+      credential: {
+        email: registerDto.email,
+        password: await this.hash(registerDto.password),
+      },
     }).save()
 
     return {
       accessToken: this.jwtService.sign({
         _id: created._id,
-        email: dto.email,
+        email: created.credential.email,
       }),
     }
   }

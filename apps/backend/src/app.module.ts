@@ -19,6 +19,8 @@ import {
   jwtConfigSchema,
   pbkdf2Config,
   pbkdf2ConfigSchema,
+  staticConfig,
+  staticConfigSchema,
 } from './config'
 import { mailerConfig, mailerConfigSchema } from './config/mailer.config'
 import {
@@ -41,6 +43,7 @@ import { UsersModule } from './users/users.module'
         pbkdf2Config,
         cacheConfig,
         mailerConfig,
+        staticConfig,
       ],
       validationSchema: joi
         .object()
@@ -49,7 +52,8 @@ import { UsersModule } from './users/users.module'
         .concat(jwtConfigSchema)
         .concat(pbkdf2ConfigSchema)
         .concat(cacheConfigSchema)
-        .concat(mailerConfigSchema),
+        .concat(mailerConfigSchema)
+        .concat(staticConfigSchema),
     }),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {

@@ -11,10 +11,7 @@ export class Post {
   _id?: string
 
   @Prop({ type: [String], default: [] })
-  imageLinks: string[]
-
-  @Prop({ type: [String], default: [] })
-  videoLinks: string[]
+  staticLinks: string[]
 
   @Prop({ default: '' })
   text: string

@@ -1,5 +1,7 @@
 export * from './base.config'
 export * from './cache.config'
 export * from './jwt.config'
+export * from './mailer.config'
 export * from './mongo.config'
 export * from './pbkdf2.config'
+export * from './static.config'

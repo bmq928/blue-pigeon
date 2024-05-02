@@ -5,5 +5,5 @@ export class CreatePostDto {
   text: string[]
 
   @IsArray()
-  file: Express.Multer.File[]
+  files: Express.Multer.File[]
 }

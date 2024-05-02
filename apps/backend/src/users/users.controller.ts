@@ -8,11 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
+import { AuthGuard, AuthUserId } from '../common/guards/auth.guard'
 import { RegisterDto } from './dto'
 import { AddFriendDto } from './dto/add-friend.dto'
 import { SetupProfileDto } from './dto/setup-profile.dto'
 import { VerifyRegisterDto } from './dto/verify-register.dto'
-import { AuthGuard, AuthUserId } from './users.guard'
 import {
   UserAuthTokenResponse,
   UserRegisterResponse,

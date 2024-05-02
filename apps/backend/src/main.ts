@@ -1,6 +1,7 @@
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common'
 import { ConfigType } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
+import type {} from 'multer' // allow Express.Multer.File
 import { AppModule } from './app.module'
 import { baseConfig } from './config'
 

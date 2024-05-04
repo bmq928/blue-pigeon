@@ -72,6 +72,7 @@ import { UsersModule } from './users/users.module'
         return {
           uri: `mongodb://${conf.host}:${conf.port}`,
           dbName: conf.database,
+          replicaSet: conf.replicaSet,
           auth: {
             username: conf.username,
             password: conf.password,

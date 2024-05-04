@@ -7,11 +7,12 @@ import {
 import { ConfigType } from '@nestjs/config'
 import { InjectModel } from '@nestjs/mongoose'
 import type { Model } from 'mongoose'
-import * as crypto from 'node:crypto'
+import { Types } from 'mongoose'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { PaginatedQueryDto, SortEnum } from '../common/dto/paginated.dto'
 import { staticConfig } from '../config'
+import { CrytpoService } from '../crypto/crypto.service'
 import { UserResponse } from '../users/users.response'
 import { CreatePostDto } from './dto/create-post.dto'
 import { ServeStaticDto } from './dto/serve-static.dto'
@@ -25,6 +26,7 @@ export class PostsService {
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     @Inject(staticConfig.KEY)
     private readonly staticConf: ConfigType<typeof staticConfig>,
+    private readonly cryptoService: CrytpoService,
   ) {}
 
   async list(
@@ -35,23 +37,27 @@ export class PostsService {
       .aggregate()
       .facet({
         data: [
-          { $match: { createdById: userId } },
+          { $match: { createdBy: new Types.ObjectId(userId) } },
           { $sort: { [query.sortBy]: query.sort === SortEnum.ASC ? 1 : -1 } },
-          { $skip: query.page * query.perPage },
+          { $skip: (query.page - 1) * query.perPage },
           { $limit: query.perPage },
         ],
-        total: [{ $match: { createdById: userId } }, { $count: 'count' }],
+        total: [
+          { $match: { createdBy: new Types.ObjectId(userId) } },
+          { $count: 'count' },
+        ],
       })
       .exec()
+
     return {
       data: resp.data,
-      pageInfo: { ...query, total: resp[0]?.count ?? 0 },
+      pageInfo: { ...query, total: resp.total?.[0]?.count ?? 0 },
     }
   }
 
   async post(userId: string, dto: CreatePostDto): Promise<UserResponse> {
     const folder = path.join(this.staticConf.rootPath, 'posts', userId)
-    const random = crypto.randomBytes(3).toString('hex')
+    const random = this.cryptoService.random()
     const toFilePath = (f: Express.Multer.File) =>
       path.join(folder, `${random}-${f.originalname}`)
 
@@ -62,6 +68,7 @@ export class PostsService {
     const created = await new this.postModel({
       text: dto.text,
       staticLinks: dto.files.map(toFilePath),
+      createdBy: userId,
     }).save()
 
     return created.toObject()

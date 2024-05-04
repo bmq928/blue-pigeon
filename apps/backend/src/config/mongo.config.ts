@@ -7,6 +7,7 @@ export interface MongoConfig {
   database: string
   username: string
   password: string
+  replicaSet: string
 }
 
 export const MONGO_CONFIG_TOKEN = 'mongo'
@@ -19,6 +20,7 @@ export const mongoConfig = registerAs(
     database: process.env['MONGO_DATABASE'],
     username: process.env['MONGO_USERNAME'],
     password: process.env['MONGO_PASSWORD'],
+    replicaSet: process.env['MONGO_REPLICA_SET'],
   }),
 )
 
@@ -28,4 +30,5 @@ export const mongoConfigSchema = joi.object({
   MONGO_DATABASE: joi.string().required(),
   MONGO_USERNAME: joi.string().required(),
   MONGO_PASSWORD: joi.string().required(),
+  MONGO_REPLICA_SET: joi.string().required(),
 })

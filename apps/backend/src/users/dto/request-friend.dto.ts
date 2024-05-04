@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-export class VerifyRegisterDto {
+export class RequestFriendDto {
   @IsString()
   @IsNotEmpty()
-  key: string
+  friendId: string
 }

@@ -3,7 +3,6 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common'
 import { ConfigType } from '@nestjs/config'
@@ -12,8 +11,8 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Cache } from 'cache-manager'
 import { isNotEmpty } from 'class-validator'
 import type { Model } from 'mongoose'
-import * as crypto from 'node:crypto'
-import { cacheConfig, pbkdf2Config } from '../config'
+import { cacheConfig } from '../config'
+import { CrytpoService } from '../crypto/crypto.service'
 import { MailerService } from '../mailer/mailer.service'
 import { LoginDto, RegisterDto } from './dto'
 import { SetupProfileDto } from './dto/setup-profile.dto'
@@ -29,8 +28,7 @@ import {
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @Inject(pbkdf2Config.KEY)
-    private readonly pbkdf2Env: ConfigType<typeof pbkdf2Config>,
+    private readonly cryptoService: CrytpoService,
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER) private readonly cacheManger: Cache,
     @Inject(cacheConfig.KEY)
@@ -48,11 +46,14 @@ export class UsersService {
     if (existed)
       throw new BadRequestException([`email ${dto.email} is existed`])
 
-    const randomKey = crypto.randomUUID()
+    const randomKey = this.cryptoService.random()
     const cacheKey = `${this.cacheConf.register.prefix}-${randomKey}`
     await this.cacheManger.set(
       cacheKey,
-      JSON.stringify({ ...dto, password: await this.hash(dto.password) }),
+      JSON.stringify({
+        ...dto,
+        password: await this.cryptoService.hash(dto.password),
+      }),
       this.cacheConf.register.ttl,
     )
     await this.mailerService.send({
@@ -67,7 +68,7 @@ export class UsersService {
     const existed = await this.userModel
       .findOne({
         'credential.email': dto.email,
-        'credential.password': await this.hash(dto.password),
+        'credential.password': await this.cryptoService.hash(dto.password),
       })
       .lean()
 
@@ -132,42 +133,56 @@ export class UsersService {
       .lean()
   }
 
-  async addFriends(userId: string, friendId: string): Promise<UserResponse> {
-    const session = await this.userModel.startSession()
-    const updated = await this.userModel
-      .findByIdAndUpdate(
-        userId,
-        {
-          $addToSet: {
-            friendIds: friendId,
-          },
-        },
-        { session, returnDocument: 'after' },
-      )
-      .lean()
-    await this.userModel.findByIdAndUpdate(
+  async requestFriend(userId: string, friendId: string): Promise<UserResponse> {
+    if (userId === friendId)
+      throw new BadRequestException(['cannot request friend to yourself'])
+
+    const updated = await this.userModel.findByIdAndUpdate(
       friendId,
-      { $addToSet: { friendIds: userId } },
-      { session },
+      {
+        $addToSet: { friendRequests: userId },
+      },
+      { returnDocument: 'after' },
+    )
+
+    if (!updated) throw new NotFoundException(['friendId is not found'])
+    return updated.toObject()
+  }
+
+  async acceptFriend(userId: string, friendId: string): Promise<UserResponse> {
+    const user = await this.userModel.findById(userId)
+
+    if (!user.friendRequests.includes(friendId))
+      throw new BadRequestException(['not have friend request'])
+
+    const session = await this.userModel.startSession()
+    const [updated] = await session.withTransaction(() =>
+      Promise.all([
+        this.userModel
+          .findByIdAndUpdate(
+            userId,
+            {
+              $addToSet: {
+                friends: friendId,
+              },
+              $pull: {
+                friendRequests: friendId,
+              },
+            },
+            { session, returnDocument: 'after' },
+          )
+          .lean(),
+        this.userModel
+          .findByIdAndUpdate(
+            friendId,
+            { $addToSet: { friends: userId } },
+            { session },
+          )
+          .lean(),
+      ]),
     )
     await session.endSession()
 
     return updated as UserResponse
-  }
-
-  private hash(raw: string): Promise<string> {
-    return new Promise((resolve, reject) =>
-      crypto.pbkdf2(
-        raw,
-        this.pbkdf2Env.pbkdf2Salt,
-        this.pbkdf2Env.pbkdf2Iterations,
-        this.pbkdf2Env.pbkdf2KeyLens,
-        this.pbkdf2Env.pbkdf2Digest,
-        (err: Error | null, buf: Buffer) =>
-          err
-            ? reject(new InternalServerErrorException(err))
-            : resolve(buf.toString('hex')),
-      ),
-    )
   }
 }

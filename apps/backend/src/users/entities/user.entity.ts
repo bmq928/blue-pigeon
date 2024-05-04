@@ -1,38 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { randomUUID } from 'node:crypto'
+import { Schema as SchemaTypes } from 'mongoose'
 import { UserCredential } from './user-credential.entity'
 import { UserProfile } from './user-profile.entity'
 
 export type UserDocument = User & Document
 
-@Schema({ timestamps: true, _id: false })
+@Schema({ timestamps: true })
 export class User {
-  @Prop({ type: UserCredential })
+  @Prop({ type: UserCredential, required: true })
   credential: UserCredential
 
-  @Prop({ type: UserProfile, default: null })
-  profile: UserProfile
+  @Prop({ type: UserProfile })
+  profile?: UserProfile
 
-  @Prop({ default: [] })
-  friendIds: string[] = []
+  @Prop({ type: [SchemaTypes.Types.ObjectId], ref: User.name })
+  friends?: User[] | string[]
 
-  @Prop({ default: randomUUID })
+  @Prop({ type: [SchemaTypes.Types.ObjectId] })
+  friendRequests?: string[]
+
   _id?: string
-
-  @Prop()
   createdAt?: Date
-
-  @Prop()
   updatedAt?: Date
-
-  // populate
-  friends?: User[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
-UserSchema.virtual('friends', {
-  ref: User.name,
-  localField: '_id',
-  foreignField: 'friendIds',
-  justOne: false,
-})

@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { AuthGuard, AuthUserId } from '../common/guards/auth.guard'
-import { RegisterDto } from './dto'
-import { AddFriendDto } from './dto/add-friend.dto'
+import { LoginDto, RegisterDto } from './dto'
+import { RequestFriendDto } from './dto/request-friend.dto'
 import { SetupProfileDto } from './dto/setup-profile.dto'
 import { VerifyRegisterDto } from './dto/verify-register.dto'
 import {
@@ -32,7 +32,7 @@ export class UsersController {
   }
 
   @Post('/login')
-  login(@Body() dto: RegisterDto): Promise<UserAuthTokenResponse> {
+  login(@Body() dto: LoginDto): Promise<UserAuthTokenResponse> {
     return this.usersService
       .login(dto)
       .then((r) => plainToInstance(UserAuthTokenResponse, r))
@@ -59,13 +59,24 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Put('/friends')
-  addFriends(
+  @Post('/friends/requests')
+  requestFriend(
     @AuthUserId() userId: string,
-    @Body() dto: AddFriendDto,
+    @Body() dto: RequestFriendDto,
   ): Promise<UserResponse> {
     return this.usersService
-      .addFriends(userId, dto.friendId)
+      .requestFriend(userId, dto.friendId)
+      .then((r) => plainToInstance(UserResponse, r))
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('/friends/accept')
+  acceptFriend(
+    @AuthUserId() userId: string,
+    @Body() dto: RequestFriendDto,
+  ): Promise<UserResponse> {
+    return this.usersService
+      .acceptFriend(userId, dto.friendId)
       .then((r) => plainToInstance(UserResponse, r))
   }
 }

@@ -4,7 +4,7 @@ export type UserCredentialDocument = UserCredential & Document
 
 @Schema({ _id: false, timestamps: true })
 export class UserCredential {
-  @Prop()
+  @Prop({ unique: true })
   email: string
 
   @Prop()

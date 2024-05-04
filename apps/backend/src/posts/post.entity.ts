@@ -1,41 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { randomUUID } from 'node:crypto'
+import { Schema as SchemaTypes } from 'mongoose'
 import { User } from '../users/entities'
 
 export type PostDocument = Post & Document
 
-@Schema({ timestamps: true, _id: false })
+@Schema({ timestamps: true })
 export class Post {
-  // auto generated
-  @Prop({ default: randomUUID })
-  _id?: string
-
   @Prop({ type: [String], default: [] })
   staticLinks: string[]
 
   @Prop({ default: '' })
   text: string
 
-  @Prop()
-  createdById: string
+  @Prop({ ref: User.name, type: SchemaTypes.Types.ObjectId })
+  createdBy: User | string
 
   // auto generated
-  @Prop()
-  createdAt?: number
-
-  // auto generated
-  @Prop()
-  updatedAt?: number
-
-  // populated
-  createdBy: User
+  _id?: string
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post)
-
-PostSchema.virtual('createdBy', {
-  ref: User.name,
-  localField: '_id',
-  foreignField: 'createdById',
-  justOne: true,
-})

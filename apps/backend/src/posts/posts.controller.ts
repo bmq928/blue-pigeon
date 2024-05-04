@@ -38,11 +38,11 @@ export class PostsController {
   @UseInterceptors(FileFieldsInterceptor([{ name: 'files', maxCount: 10 }]))
   post(
     @AuthUserId() userId: string,
-    @UploadedFiles() { files }: Pick<CreatePostDto, 'files'>,
+    @UploadedFiles() fileDto: Pick<CreatePostDto, 'files'>,
     @Body() body: Omit<CreatePostDto, 'files'>,
   ): Promise<PostResponse> {
     return this.postsService
-      .post(userId, { ...body, files })
+      .post(userId, { ...body, files: fileDto?.files ?? [] })
       .then((r) => plainToInstance(PostResponse, r))
   }
 

@@ -9,9 +9,7 @@ const { basePath } = baseConfig()
 const STATIC_SERVE_API = `${basePath}/v1/posts/statics`
 
 export class PostResponse implements Post {
-  createdById: string
-  createdBy: User
-  _id?: string
+  createdBy: string | User
 
   @Transform(({ value }) =>
     value.map((l) =>
@@ -21,8 +19,9 @@ export class PostResponse implements Post {
   staticLinks: string[]
 
   text: string
-  createdAt?: number
-  updatedAt?: number
+  _id?: string
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export class PostsPaginatedResponse extends PaginatedResponse<PostResponse> {

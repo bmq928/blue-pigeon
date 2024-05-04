@@ -1,2 +1,5 @@
 export * from './login.dto'
 export * from './register.dto'
+export * from './request-friend.dto'
+export * from './setup-profile.dto'
+export * from './verify-register.dto'

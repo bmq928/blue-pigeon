@@ -1,21 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { BEARER_TOKEN_QUERY_KEY } from './use-bearer-token'
+import {
+  BEARER_TOKEN_LOCAL_STORAGE_KEY,
+  BEARER_TOKEN_QUERY_KEY,
+} from './use-bearer-token'
 
-export type RegisterBody = {
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-}
-export function useRegister() {
+export type RegisterVerifyParam = { key: string }
+export function useRegisterVerify() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (body: RegisterBody) => {
-      const resp = await fetch('/api/v1/users/register', {
-        method: 'POST',
-        body: JSON.stringify(body),
+    mutationFn: async (body: RegisterVerifyParam) => {
+      const resp = await fetch(`/api/v1/users/email/verify/${body.key}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -25,7 +22,8 @@ export function useRegister() {
       if (!resp.ok) throw new Error(respData.message)
       return respData
     },
-    onSuccess: () => {
+    onSuccess: (data: { accessToken: string }) => {
+      localStorage.setItem(BEARER_TOKEN_LOCAL_STORAGE_KEY, data.accessToken)
       queryClient.invalidateQueries({ queryKey: [BEARER_TOKEN_QUERY_KEY] })
     },
     onError: (err) => toast.error(err.message),

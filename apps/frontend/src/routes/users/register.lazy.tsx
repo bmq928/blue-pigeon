@@ -1,10 +1,15 @@
-import { Link, createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createLazyFileRoute, useNavigate } from '@tanstack/react-router'
+import { useForm } from 'react-hook-form'
+import { RegisterBody, useRegister } from '../../hooks'
 
 export const Route = createLazyFileRoute('/users/register')({
   component: () => <Page />,
 })
 
 function Page() {
+  const { mutate } = useRegister()
+  const { register, handleSubmit } = useForm<RegisterBody>()
+  const navigate = useNavigate()
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -13,7 +18,14 @@ function Page() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create and account
             </h1>
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form
+              className="space-y-4 md:space-y-6"
+              onSubmit={handleSubmit((data) =>
+                mutate(data, {
+                  onSuccess: () => navigate({ to: '/users/verify-register' }),
+                }),
+              )}
+            >
               <div>
                 <label
                   htmlFor="first-name"
@@ -23,11 +35,11 @@ function Page() {
                 </label>
                 <input
                   type="first-name"
-                  name="first-name"
                   id="first-name"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="John"
                   required={true}
+                  {...register('firstName')}
                 />
               </div>
               <div>
@@ -39,11 +51,11 @@ function Page() {
                 </label>
                 <input
                   type="last-name"
-                  name="last-name"
                   id="last-name"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Doe"
                   required={true}
+                  {...register('lastName')}
                 />
               </div>
               <div>
@@ -55,11 +67,11 @@ function Page() {
                 </label>
                 <input
                   type="email"
-                  name="email"
                   id="email"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                   required={true}
+                  {...register('email')}
                 />
               </div>
               <div>
@@ -71,11 +83,11 @@ function Page() {
                 </label>
                 <input
                   type="password"
-                  name="password"
                   id="password"
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required={true}
+                  {...register('password')}
                 />
               </div>
               <div>

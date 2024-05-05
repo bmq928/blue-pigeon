@@ -1,11 +1,17 @@
-import { StrictMode } from 'react'
-import * as ReactDOM from 'react-dom/client'
+import { createRouter, RouterProvider } from '@tanstack/react-router'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { routeTree } from './routeTree.gen'
+import { NotFoundPage } from './components'
+import './styles.css'
 
-import FileUpload from './file-upload'
-
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
-root.render(
-  <StrictMode>
-    <FileUpload />
-  </StrictMode>,
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <RouterProvider
+      router={createRouter({
+        routeTree,
+        defaultNotFoundComponent: () => <NotFoundPage />,
+      })}
+    />
+  </React.StrictMode>,
 )

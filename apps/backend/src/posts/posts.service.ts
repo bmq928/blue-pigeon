@@ -13,12 +13,11 @@ import * as path from 'node:path'
 import { PaginatedQueryDto, SortEnum } from '../common/dto/paginated.dto'
 import { staticConfig } from '../config'
 import { CrytpoService } from '../crypto/crypto.service'
-import { UserResponse } from '../users/users.response'
 import { CreatePostDto } from './dto/create-post.dto'
 import { ServeStaticDto } from './dto/serve-static.dto'
 import { Post, PostDocument } from './post.entity'
 import { MIME_TYPES_MAP } from './posts.constants'
-import { PostsPaginatedResponse } from './posts.response'
+import { PostResponse, PostsPaginatedResponse } from './posts.response'
 
 @Injectable()
 export class PostsService {
@@ -55,7 +54,7 @@ export class PostsService {
     }
   }
 
-  async post(userId: string, dto: CreatePostDto): Promise<UserResponse> {
+  async post(userId: string, dto: CreatePostDto): Promise<PostResponse> {
     const folder = path.join(this.staticConf.rootPath, 'posts', userId)
     const random = this.cryptoService.random()
     const toFilePath = (f: Express.Multer.File) =>

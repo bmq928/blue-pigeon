@@ -1,5 +1,5 @@
-import { TextAvatar } from '../avatar'
 import { formatDistance } from 'date-fns/formatDistance'
+import { TextAvatar } from '../avatar'
 
 export type PostProps = {
   text: string
@@ -31,17 +31,21 @@ export function Post({
           {formatDistance(updatedAt, new Date(), { addSuffix: true })}
         </span>
       </div>
-      <p className="mb-5 font-light text-gray-500 dark:text-gray-400">{text}</p>
-      {staticLinks.length ? (
-        <div>
-          <h1>Attachments</h1>
-          {staticLinks.map((link) => (
-            <a key={link} href={link} download>
-              {link}
-            </a>
-          ))}
-        </div>
-      ) : null}
+      <p className="mb-5 font-light text-gray-500 dark:text-gray-400">
+        {text}
+        {staticLinks.length ? (
+          <div>
+            {staticLinks.map((link: string, idx: number) => (
+              <div key={link}>
+                <a className="text-primary-800 underline" href={link} download>
+                  file {idx}
+                </a>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </p>
+
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <TextAvatar name={createdBy} />

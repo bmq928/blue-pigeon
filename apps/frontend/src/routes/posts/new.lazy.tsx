@@ -1,11 +1,18 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import { Header } from '../../components'
+import { CreatePostBody, usePostCreate } from '../../hooks'
 
 export const Route = createLazyFileRoute('/posts/new')({
   component: () => <Page />,
 })
 
 function Page() {
+  const { register, handleSubmit } = useForm<CreatePostBody>()
+  const { mutate } = usePostCreate()
+  const navigate = useNavigate()
+
   return (
     <>
       <Header />
@@ -16,7 +23,17 @@ function Page() {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Create a new post
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleSubmit((data) =>
+                  mutate(data, {
+                    onSuccess: () => {
+                      toast.success('Successfully created new post')
+                      navigate({ to: '/posts' })
+                    },
+                  }),
+                )}
+              >
                 <div>
                   <label
                     htmlFor="text"
@@ -25,11 +42,11 @@ function Page() {
                     Content
                   </label>
                   <textarea
-                    name="text"
                     id="text"
                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Write some of your thoughts"
                     required={true}
+                    {...register('text')}
                   />
                 </div>
                 <div>
@@ -43,6 +60,8 @@ function Page() {
                     className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                     id="file"
                     type="file"
+                    multiple
+                    {...register('files')}
                   />
                 </div>
                 <button

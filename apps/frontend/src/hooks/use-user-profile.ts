@@ -17,7 +17,6 @@ export type GetUserProfileResponse = {
     updatedAt?: Date
   }
   friends?: string[]
-
   friendRequests: string[]
 }
 export const USER_PROFILE_QUERY_KEY = 'USER_PROFILE_QUERY_KEY'

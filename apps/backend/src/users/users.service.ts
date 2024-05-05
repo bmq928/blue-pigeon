@@ -10,7 +10,8 @@ import { JwtService } from '@nestjs/jwt'
 import { InjectModel } from '@nestjs/mongoose'
 import { Cache } from 'cache-manager'
 import { isNotEmpty } from 'class-validator'
-import type { Model } from 'mongoose'
+import { Types, type Model } from 'mongoose'
+import { PaginatedQueryDto, SortEnum } from '../common/dto/paginated.dto'
 import { cacheConfig } from '../config'
 import { CrytpoService } from '../crypto/crypto.service'
 import { MailerService } from '../mailer/mailer.service'
@@ -22,6 +23,7 @@ import {
   UserAuthTokenResponse,
   UserRegisterResponse,
   UserResponse,
+  UsersPaginatedResponse,
 } from './users.response'
 
 @Injectable()
@@ -35,6 +37,41 @@ export class UsersService {
     private readonly cacheConf: ConfigType<typeof cacheConfig>,
     private readonly mailerService: MailerService,
   ) {}
+
+  async listAvailableFriends(
+    userId: string,
+    query: PaginatedQueryDto,
+  ): Promise<UsersPaginatedResponse> {
+    const me = await this.userModel.findById(userId)
+    const [resp] = await this.userModel
+      .aggregate()
+      .facet({
+        data: [
+          {
+            $match: {
+              _id: { $nin: [me._id, ...me.friends, ...me.friendRequests] },
+            },
+          },
+          { $sort: { [query.sortBy]: query.sort === SortEnum.ASC ? 1 : -1 } },
+          { $skip: (query.page - 1) * query.perPage },
+          { $limit: query.perPage },
+        ],
+        total: [
+          {
+            $match: {
+              $and: [{ _id: { $ne: new Types.ObjectId(userId) } }],
+            },
+          },
+          { $count: 'count' },
+        ],
+      })
+      .exec()
+
+    return {
+      data: resp.data,
+      pageInfo: { ...query, total: resp.total?.[0]?.count ?? 0 },
+    }
+  }
 
   async register(dto: RegisterDto): Promise<UserRegisterResponse> {
     const existed = await this.userModel

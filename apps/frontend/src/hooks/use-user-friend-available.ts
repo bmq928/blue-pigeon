@@ -6,18 +6,27 @@ enum SortEnum {
   ASC = 'asc',
   DESC = 'desc',
 }
-export type GetPostsProps = {
+export type GetUserFriendAvailableProps = {
   page?: number
   perPage?: number
 }
-export type GetPostsResponse = {
+export type GetUserFriendAvailableResponse = {
   data: {
-    createdBy: string
-    staticLinks: string[]
-    text: string
-    _id?: string
-    createdAt: Date
-    updatedAt: Date
+    _id: string
+    credential: {
+      email: string
+    }
+    profile: {
+      firstName: string
+      lastName: string
+      favSport?: string
+      favSportPersonality?: string
+      favSportTeam?: string
+      createdAt?: Date
+      updatedAt?: Date
+    }
+    friends?: string[]
+    friendRequests: string[]
   }[]
 
   pageInfo: {
@@ -28,16 +37,19 @@ export type GetPostsResponse = {
     sortBy: string
   }
 }
-export const POSTS_QUERY_KEY = 'POSTS_QUERY_KEY'
-export function usePosts({ page = 1, perPage = 10 }: GetPostsProps = {}) {
+export const USERS_QUERY_KEY = 'USERS_QUERY_KEY'
+export function useUserFriendsAvailable({
+  page = 1,
+  perPage = 10,
+}: GetUserFriendAvailableProps = {}) {
   const { mutate: logout } = useLogout()
 
   return useQuery({
-    queryKey: [POSTS_QUERY_KEY, {}],
-    queryFn: async (): Promise<GetPostsResponse> => {
+    queryKey: [USERS_QUERY_KEY, {}],
+    queryFn: async (): Promise<GetUserFriendAvailableResponse> => {
       const { token } = getBearerToken()
       const resp = await fetch(
-        `/api/v1/posts?page=${page}&perPage=${perPage}`,
+        `/api/v1/users/friends/available?page=${page}&perPage=${perPage}`,
         {
           method: 'GET',
           headers: {

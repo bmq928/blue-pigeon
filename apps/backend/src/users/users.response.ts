@@ -1,4 +1,5 @@
 import { Exclude, Type, TypeHelpOptions } from 'class-transformer'
+import { PaginatedResponse } from '../common/dto/paginated.dto'
 import { UserCredential } from './entities'
 import {
   FavSport,
@@ -33,29 +34,17 @@ export class UserResponse implements User {
   @Type(() => UserProfileResponse)
   profile: UserProfile
 
-  // @Transform(({ value }) =>
-  //   value.map((i) =>
-  //     i instanceof SchemaTypes.Types.ObjectId
-  //       ? { ...value, __type: 'ObjectId' }
-  //       : { ...value, __type: 'UserResponse' },
-  //   ),
-  // )
-  // @Type(() => UserResponse, {
-  //   discriminator: {
-  //     property: '__type',
-  //     subTypes: [
-  //       { value: UserResponse, name: 'UserResponse' },
-  //       { value: String, name: 'ObjectId' },
-  //     ],
-  //   },
-  //   keepDiscriminatorProperty: false,
-  // })
   @Type(({ object, property }: TypeHelpOptions) =>
     object[property]?.[0]?.createdAt ? UserResponse : String,
   )
   friends?: UserResponse[] | string[]
 
   friendRequests: string[]
+}
+
+export class UsersPaginatedResponse extends PaginatedResponse<UserResponse> {
+  @Type(() => UserResponse)
+  data: UserResponse[]
 }
 
 export class UserAuthTokenResponse {

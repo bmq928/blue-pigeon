@@ -5,9 +5,11 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
+import { PaginatedQueryDto } from '../common/dto/paginated.dto'
 import { AuthGuard, AuthUserId } from '../common/guards/auth.guard'
 import { LoginDto, RegisterDto } from './dto'
 import { RequestFriendDto } from './dto/request-friend.dto'
@@ -17,12 +19,24 @@ import {
   UserAuthTokenResponse,
   UserRegisterResponse,
   UserResponse,
+  UsersPaginatedResponse,
 } from './users.response'
 import { UsersService } from './users.service'
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(AuthGuard)
+  @Get('/friends/available')
+  list(
+    @AuthUserId() userId: string,
+    @Query() query: PaginatedQueryDto,
+  ): Promise<UsersPaginatedResponse> {
+    return this.usersService
+      .listAvailableFriends(userId, query)
+      .then((r) => plainToInstance(UsersPaginatedResponse, r))
+  }
 
   @Post('/register')
   register(@Body() dto: RegisterDto): Promise<UserRegisterResponse> {

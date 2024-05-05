@@ -1,12 +1,12 @@
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
-import { Header } from '../../components'
-import { useUserProfile } from '../../hooks'
 import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { Header } from '../../components'
 import {
   UpdateUserProfileBody,
-  useUserProfileMutate,
-} from '../../hooks/use-user-profile-mutate'
-import { toast } from 'react-toastify'
+  usePostCreate,
+  useUserProfile,
+} from '../../hooks'
 
 export const Route = createLazyFileRoute('/users/profile')({
   component: () => <Page />,
@@ -15,7 +15,7 @@ export const Route = createLazyFileRoute('/users/profile')({
 function Page() {
   const { data: userProfileData } = useUserProfile()
   const { register, handleSubmit } = useForm<UpdateUserProfileBody>()
-  const { mutate } = useUserProfileMutate()
+  const { mutate } = usePostCreate()
 
   return (
     <>

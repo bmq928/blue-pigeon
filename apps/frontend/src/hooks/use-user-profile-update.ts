@@ -28,7 +28,7 @@ export type UpdateUserProfileResponse = {
   friends?: string[]
   friendRequests: string[]
 }
-export function useUserProfileMutate() {
+export function useUserProfileUpdate() {
   const { mutate: logout } = useLogout()
   const queryClient = useQueryClient()
 

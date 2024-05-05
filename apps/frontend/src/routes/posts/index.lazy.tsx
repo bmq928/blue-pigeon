@@ -1,11 +1,16 @@
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import { Post, Header, HeaderSpace, HeroSection } from '../../components'
+import { usePosts } from '../../hooks/use-posts'
+import { useUserProfile } from '../../hooks'
 
 export const Route = createLazyFileRoute('/posts/')({
   component: () => <Page />,
 })
 
 function Page() {
+  const { data: postsData } = usePosts()
+  const { data: userProfileData } = useUserProfile()
+
   return (
     <>
       <Header />
@@ -26,28 +31,15 @@ function Page() {
             </Link>
           </div>
           <div className="grid gap-8">
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
-            <Post />
+            {postsData?.data.map((post) => (
+              <Post
+                key={post._id}
+                createdBy={`${userProfileData?.profile.firstName} ${userProfileData?.profile.lastName}`}
+                staticLinks={post.staticLinks}
+                text={post.text ?? '<empty>'}
+                updatedAt={post.updatedAt}
+              />
+            ))}
           </div>
         </div>
       </section>

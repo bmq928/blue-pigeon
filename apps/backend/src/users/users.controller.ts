@@ -48,6 +48,14 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('/profile')
+  getProfile(@AuthUserId() userId: string): Promise<UserResponse> {
+    return this.usersService
+      .getProfile(userId)
+      .then((r) => plainToInstance(UserResponse, r))
+  }
+
+  @UseGuards(AuthGuard)
   @Put('/profile')
   setupProfile(
     @AuthUserId() userId: string,

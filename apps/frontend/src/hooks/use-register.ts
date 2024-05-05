@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import {
   BEARER_TOKEN_LOCAL_STORAGE_KEY,
   BEARER_TOKEN_QUERY_KEY,
-} from './useBearerToken'
+} from './use-bearer-token'
 
 export type UseRegisterProps = { email: string; password: string }
 export function useRegister() {
@@ -27,8 +27,6 @@ export function useRegister() {
       localStorage.setItem(BEARER_TOKEN_LOCAL_STORAGE_KEY, data.accessToken)
       queryClient.invalidateQueries({ queryKey: [BEARER_TOKEN_QUERY_KEY] })
     },
-    onError: (err) => {
-      toast.error(err.message, { hideProgressBar: true })
-    },
+    onError: (err) => toast.error(err.message),
   })
 }

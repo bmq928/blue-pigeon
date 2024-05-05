@@ -2,14 +2,14 @@ import { Transform, Type } from 'class-transformer'
 import { isURL } from 'class-validator'
 import { PaginatedResponse } from '../common/dto/paginated.dto'
 import { baseConfig } from '../config'
-import { User } from '../users/entities'
+import { UserResponse } from '../users/users.response'
 import { Post } from './post.entity'
 
 const { basePath } = baseConfig()
 const STATIC_SERVE_API = `${basePath}/v1/posts/statics`
 
 export class PostResponse implements Post {
-  createdBy: string | User
+  createdBy: string | UserResponse
 
   @Transform(({ value }) =>
     value.map((l) =>

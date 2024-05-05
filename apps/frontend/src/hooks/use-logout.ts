@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import {
   BEARER_TOKEN_LOCAL_STORAGE_KEY,
   BEARER_TOKEN_QUERY_KEY,
-} from './useBearerToken'
+} from './use-bearer-token'
 
 export function useLogout() {
   const queryClient = useQueryClient()
@@ -12,8 +12,6 @@ export function useLogout() {
       localStorage.removeItem(BEARER_TOKEN_LOCAL_STORAGE_KEY),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: [BEARER_TOKEN_QUERY_KEY] }),
-    onError: (err) => {
-      toast.error(err.message, { hideProgressBar: true })
-    },
+    onError: (err) => toast.error(err.message),
   })
 }

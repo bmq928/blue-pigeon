@@ -12,8 +12,6 @@ export class UserCredentialResponse implements UserCredential {
   @Exclude()
   password: string
   email: string
-  createdAt: Date
-  updatedAt: Date
 }
 
 export class UserProfileResponse implements UserProfile {

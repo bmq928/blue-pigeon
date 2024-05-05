@@ -9,12 +9,6 @@ export class UserCredential {
 
   @Prop()
   password: string
-
-  @Prop()
-  createdAt?: Date
-
-  @Prop()
-  updatedAt?: Date
 }
 
 export const UserCredentialSchema = SchemaFactory.createForClass(UserCredential)

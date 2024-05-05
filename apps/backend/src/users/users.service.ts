@@ -108,6 +108,11 @@ export class UsersService {
     }
   }
 
+  async getProfile(userId: string): Promise<UserResponse> {
+    const founded = await this.userModel.findById(userId)
+    return founded.toObject()
+  }
+
   async setupProfile(
     userId: string,
     dto: SetupProfileDto,

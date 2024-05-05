@@ -19,6 +19,9 @@ import { Route as rootRoute } from './routes/__root'
 const IndexLazyImport = createFileRoute('/')()
 const UsersIndexLazyImport = createFileRoute('/users/')()
 const PostsIndexLazyImport = createFileRoute('/posts/')()
+const UsersVerifyRegisterLazyImport = createFileRoute(
+  '/users/verify-register',
+)()
 const UsersRegisterLazyImport = createFileRoute('/users/register')()
 const UsersProfileLazyImport = createFileRoute('/users/profile')()
 const UsersLoginLazyImport = createFileRoute('/users/login')()
@@ -40,6 +43,13 @@ const PostsIndexLazyRoute = PostsIndexLazyImport.update({
   path: '/posts/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/posts/index.lazy').then((d) => d.Route))
+
+const UsersVerifyRegisterLazyRoute = UsersVerifyRegisterLazyImport.update({
+  path: '/users/verify-register',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/users/verify-register.lazy').then((d) => d.Route),
+)
 
 const UsersRegisterLazyRoute = UsersRegisterLazyImport.update({
   path: '/users/register',
@@ -87,6 +97,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersRegisterLazyImport
       parentRoute: typeof rootRoute
     }
+    '/users/verify-register': {
+      preLoaderRoute: typeof UsersVerifyRegisterLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/posts/': {
       preLoaderRoute: typeof PostsIndexLazyImport
       parentRoute: typeof rootRoute
@@ -106,6 +120,7 @@ export const routeTree = rootRoute.addChildren([
   UsersLoginLazyRoute,
   UsersProfileLazyRoute,
   UsersRegisterLazyRoute,
+  UsersVerifyRegisterLazyRoute,
   PostsIndexLazyRoute,
   UsersIndexLazyRoute,
 ])

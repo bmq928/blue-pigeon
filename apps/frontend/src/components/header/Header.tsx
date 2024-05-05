@@ -1,8 +1,11 @@
 import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useBearerToken, useLogout } from '../../hooks'
 
 export function Header() {
-  const [isLogin] = useState(true)
+  const { data } = useBearerToken()
+  const { mutate: logout } = useLogout()
+
+  const isLogin = !!data?.token
 
   return (
     <header className="fixed w-screen ">
@@ -38,11 +41,14 @@ export function Header() {
           {isLogin && (
             <div className="flex items-center lg:order-2 gap-5">
               <Link className="text-primary-700 underline " to="/users/profile">
-                abc@gmail.com
+                {data.email}
               </Link>
-              <Link className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+              <button
+                className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+                onClick={() => logout()}
+              >
                 Log out
-              </Link>
+              </button>
             </div>
           )}
         </div>

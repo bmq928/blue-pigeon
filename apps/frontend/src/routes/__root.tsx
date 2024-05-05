@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { ToastContainer } from 'react-toastify'
 import React, { Suspense } from 'react'
 
 const TanStackRouterDevtools =
@@ -20,6 +21,7 @@ export const Route = createRootRoute({
         <Outlet />
         <TanStackRouterDevtools />
         <ReactQueryDevtools initialIsOpen={false} />
+        <ToastContainer />
       </QueryClientProvider>
     </Suspense>
   ),

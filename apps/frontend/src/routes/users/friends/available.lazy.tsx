@@ -1,18 +1,37 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import {
   Header,
   HeaderSpace,
   HeroSection,
+  Pagination,
   UserFriendRequest,
 } from '../../../components'
-import { useUserFriendsAvailable } from '../../../hooks'
+import {
+  PER_PAGE,
+  usePagination,
+  useUserFriendsAvailable,
+} from '../../../hooks'
 
 export const Route = createLazyFileRoute('/users/friends/available')({
   component: () => <Page />,
 })
 
 function Page() {
+  const {
+    currentPage,
+    nextPage,
+    prevPage,
+    setCurrentPage,
+    setTotalPage,
+    totalPage,
+  } = usePagination()
   const { data: usersData } = useUserFriendsAvailable({ page: 1, perPage: 10 })
+
+  useEffect(
+    () => setTotalPage(Math.ceil((usersData?.pageInfo.total || 1) / PER_PAGE)),
+    [usersData?.pageInfo.total, setTotalPage],
+  )
 
   return (
     <>
@@ -40,6 +59,13 @@ function Page() {
           </div>
         </div>
       </section>
+      <Pagination
+        setCurrent={setCurrentPage}
+        next={nextPage}
+        prev={prevPage}
+        curPage={currentPage}
+        totalPage={totalPage}
+      />
     </>
   )
 }

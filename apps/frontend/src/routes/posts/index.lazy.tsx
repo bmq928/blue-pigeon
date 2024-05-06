@@ -1,15 +1,35 @@
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
-import { Post, Header, HeaderSpace, HeroSection } from '../../components'
+import { useEffect } from 'react'
+import {
+  Header,
+  HeaderSpace,
+  HeroSection,
+  Pagination,
+  Post,
+} from '../../components'
+import { PER_PAGE, usePagination, useUserProfile } from '../../hooks'
 import { usePosts } from '../../hooks/use-posts'
-import { useUserProfile } from '../../hooks'
 
 export const Route = createLazyFileRoute('/posts/')({
   component: () => <Page />,
 })
 
 function Page() {
-  const { data: postsData } = usePosts()
+  const {
+    currentPage,
+    nextPage,
+    prevPage,
+    setCurrentPage,
+    setTotalPage,
+    totalPage,
+  } = usePagination()
+  const { data: postsData } = usePosts({ page: currentPage, perPage: 1 })
   const { data: userProfileData } = useUserProfile()
+
+  useEffect(
+    () => setTotalPage(Math.ceil((postsData?.pageInfo.total || 1) / PER_PAGE)),
+    [postsData?.pageInfo.total, setTotalPage],
+  )
 
   return (
     <>
@@ -43,6 +63,13 @@ function Page() {
           </div>
         </div>
       </section>
+      <Pagination
+        setCurrent={setCurrentPage}
+        next={nextPage}
+        prev={prevPage}
+        curPage={currentPage}
+        totalPage={totalPage}
+      />
     </>
   )
 }

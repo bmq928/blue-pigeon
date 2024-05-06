@@ -45,7 +45,7 @@ export function useUserFriendsAvailable({
   const { mutate: logout } = useLogout()
 
   return useQuery({
-    queryKey: [USER_FRIEND_AVAILABLE_KEY, {}],
+    queryKey: [USER_FRIEND_AVAILABLE_KEY, { page, perPage }],
     queryFn: async (): Promise<GetUserFriendAvailableResponse> => {
       const { token } = getBearerToken()
       const resp = await fetch(

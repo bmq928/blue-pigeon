@@ -1,6 +1,7 @@
 export * from './use-bearer-token'
 export * from './use-login'
 export * from './use-logout'
+export * from './use-pagination'
 export * from './use-post-create'
 export * from './use-posts'
 export * from './use-register-verify'

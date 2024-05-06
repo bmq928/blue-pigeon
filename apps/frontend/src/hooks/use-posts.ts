@@ -33,7 +33,7 @@ export function usePosts({ page = 1, perPage = 10 }: GetPostsProps = {}) {
   const { mutate: logout } = useLogout()
 
   return useQuery({
-    queryKey: [POSTS_QUERY_KEY, {}],
+    queryKey: [POSTS_QUERY_KEY, { page, perPage }],
     queryFn: async (): Promise<GetPostsResponse> => {
       const { token } = getBearerToken()
       const resp = await fetch(

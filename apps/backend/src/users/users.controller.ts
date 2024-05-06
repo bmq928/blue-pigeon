@@ -92,6 +92,17 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('/friends/requests')
+  listFriendRequests(
+    @AuthUserId() userId: string,
+    @Query() query: PaginatedQueryDto,
+  ): Promise<UsersPaginatedResponse> {
+    return this.usersService
+      .listFriendRequests(userId, query)
+      .then((r) => plainToInstance(UsersPaginatedResponse, r))
+  }
+
+  @UseGuards(AuthGuard)
   @Put('/friends/accept')
   acceptFriend(
     @AuthUserId() userId: string,

@@ -6,11 +6,11 @@ enum SortEnum {
   ASC = 'asc',
   DESC = 'desc',
 }
-export type GetUserFriendAvailableProps = {
+export type GetUserFriendRequestsProps = {
   page?: number
   perPage?: number
 }
-export type GetUserFriendAvailableResponse = {
+export type GetUserFriendRequestsResponse = {
   data: {
     _id: string
     credential: {
@@ -37,19 +37,19 @@ export type GetUserFriendAvailableResponse = {
     sortBy: string
   }
 }
-export const USER_FRIEND_AVAILABLE_KEY = 'USER_FRIEND_AVAILABLE_KEY'
-export function useUserFriendsAvailable({
+export const USERS_FRIEND_REQUEST_QUERY_KEY = 'USERS_FRIEND_REQUEST_QUERY_KEY'
+export function useUserFriendsRequests({
   page = 1,
   perPage = 10,
-}: GetUserFriendAvailableProps = {}) {
+}: GetUserFriendRequestsProps = {}) {
   const { mutate: logout } = useLogout()
 
   return useQuery({
-    queryKey: [USER_FRIEND_AVAILABLE_KEY, {}],
-    queryFn: async (): Promise<GetUserFriendAvailableResponse> => {
+    queryKey: [USERS_FRIEND_REQUEST_QUERY_KEY, {}],
+    queryFn: async (): Promise<GetUserFriendRequestsResponse> => {
       const { token } = getBearerToken()
       const resp = await fetch(
-        `/api/v1/users/friends/available?page=${page}&perPage=${perPage}`,
+        `/api/v1/users/friends/requests?page=${page}&perPage=${perPage}`,
         {
           method: 'GET',
           headers: {

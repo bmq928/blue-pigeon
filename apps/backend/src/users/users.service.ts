@@ -43,13 +43,15 @@ export class UsersService {
     query: PaginatedQueryDto,
   ): Promise<UsersPaginatedResponse> {
     const me = await this.userModel.findById(userId)
+
     const [resp] = await this.userModel
       .aggregate()
       .facet({
         data: [
           {
             $match: {
-              _id: { $nin: [me._id, ...me.friends, ...me.friendRequests] },
+              _id: { $nin: [me._id, ...me.friends] },
+              friendRequests: { $nin: [me._id] },
             },
           },
           { $sort: { [query.sortBy]: query.sort === SortEnum.ASC ? 1 : -1 } },
@@ -66,7 +68,6 @@ export class UsersService {
         ],
       })
       .exec()
-
     return {
       data: resp.data,
       pageInfo: { ...query, total: resp.total?.[0]?.count ?? 0 },
@@ -189,6 +190,25 @@ export class UsersService {
 
     if (!updated) throw new NotFoundException(['friendId is not found'])
     return updated.toObject()
+  }
+
+  async listFriendRequests(
+    userId: string,
+    query: PaginatedQueryDto,
+  ): Promise<UsersPaginatedResponse> {
+    const { friendRequests } = await this.userModel.findById(userId, {
+      friendRequests: 1,
+    })
+    const friendIds = friendRequests
+      .slice((query.page - 1) * query.perPage, query.page * query.perPage)
+      .map((id) => new Types.ObjectId(id))
+    const friends = await this.userModel
+      .find({ _id: { $in: friendIds } })
+      .lean()
+    return {
+      data: friends as any,
+      pageInfo: { ...query, total: friendRequests.length },
+    }
   }
 
   async acceptFriend(userId: string, friendId: string): Promise<UserResponse> {

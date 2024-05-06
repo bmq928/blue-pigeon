@@ -17,7 +17,6 @@ import { Route as rootRoute } from './routes/__root'
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
-const UsersIndexLazyImport = createFileRoute('/users/')()
 const PostsIndexLazyImport = createFileRoute('/posts/')()
 const UsersVerifyRegisterLazyImport = createFileRoute(
   '/users/verify-register',
@@ -26,6 +25,12 @@ const UsersRegisterLazyImport = createFileRoute('/users/register')()
 const UsersProfileLazyImport = createFileRoute('/users/profile')()
 const UsersLoginLazyImport = createFileRoute('/users/login')()
 const PostsNewLazyImport = createFileRoute('/posts/new')()
+const UsersFriendsRequestsLazyImport = createFileRoute(
+  '/users/friends/requests',
+)()
+const UsersFriendsAvailableLazyImport = createFileRoute(
+  '/users/friends/available',
+)()
 
 // Create/Update Routes
 
@@ -33,11 +38,6 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const UsersIndexLazyRoute = UsersIndexLazyImport.update({
-  path: '/users/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/users/index.lazy').then((d) => d.Route))
 
 const PostsIndexLazyRoute = PostsIndexLazyImport.update({
   path: '/posts/',
@@ -73,6 +73,20 @@ const PostsNewLazyRoute = PostsNewLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/posts/new.lazy').then((d) => d.Route))
 
+const UsersFriendsRequestsLazyRoute = UsersFriendsRequestsLazyImport.update({
+  path: '/users/friends/requests',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/users/friends/requests.lazy').then((d) => d.Route),
+)
+
+const UsersFriendsAvailableLazyRoute = UsersFriendsAvailableLazyImport.update({
+  path: '/users/friends/available',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/users/friends/available.lazy').then((d) => d.Route),
+)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -105,8 +119,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsIndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/users/': {
-      preLoaderRoute: typeof UsersIndexLazyImport
+    '/users/friends/available': {
+      preLoaderRoute: typeof UsersFriendsAvailableLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/users/friends/requests': {
+      preLoaderRoute: typeof UsersFriendsRequestsLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -122,7 +140,8 @@ export const routeTree = rootRoute.addChildren([
   UsersRegisterLazyRoute,
   UsersVerifyRegisterLazyRoute,
   PostsIndexLazyRoute,
-  UsersIndexLazyRoute,
+  UsersFriendsAvailableLazyRoute,
+  UsersFriendsRequestsLazyRoute,
 ])
 
 /* prettier-ignore-end */

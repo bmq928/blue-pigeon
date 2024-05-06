@@ -4,21 +4,22 @@ import {
   HeaderSpace,
   HeroSection,
   UserFriendRequest,
-} from '../../components'
-import { useUserFriendsAvailable } from '../../hooks'
+} from '../../../components'
+import { useUserFriendsAvailable } from '../../../hooks'
 
-export const Route = createLazyFileRoute('/users/')({
+export const Route = createLazyFileRoute('/users/friends/available')({
   component: () => <Page />,
 })
 
 function Page() {
   const { data: usersData } = useUserFriendsAvailable({ page: 1, perPage: 10 })
+
   return (
     <>
       <Header />
       <HeaderSpace />
       <HeroSection
-        title="Friends"
+        title="Find more friends"
         description="Expand your horizons and enrich your life by forging new
               friendships around the globe"
       />
@@ -27,6 +28,8 @@ function Page() {
           <div className="grid gap-8 mb-6 lg:mb-16">
             {usersData?.data.map((user) => (
               <UserFriendRequest
+                userId={user._id}
+                type="listing"
                 key={user._id}
                 name={`${user.profile.firstName} ${user.profile.lastName}`}
                 favSport={user.profile.favSport}

@@ -4,8 +4,8 @@ import { toast } from 'react-toastify'
 import { Header } from '../../components'
 import {
   UpdateUserProfileBody,
-  usePostCreate,
   useUserProfile,
+  useUserProfileUpdate,
 } from '../../hooks'
 
 export const Route = createLazyFileRoute('/users/profile')({
@@ -15,7 +15,7 @@ export const Route = createLazyFileRoute('/users/profile')({
 function Page() {
   const { data: userProfileData } = useUserProfile()
   const { register, handleSubmit } = useForm<UpdateUserProfileBody>()
-  const { mutate } = usePostCreate()
+  const { mutate } = useUserProfileUpdate()
 
   return (
     <>
@@ -399,21 +399,29 @@ function Page() {
                     </option>
                   </select>
                 </div>
+                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                  <Link
+                    to="/users/friends/available"
+                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                  >
+                    Find more friends
+                  </Link>
+                  <span>
+                    {'  '}/ {'  '}
+                  </span>
+                  <Link
+                    to="/users/friends/requests"
+                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                  >
+                    Accept friend requests
+                  </Link>
+                </p>
                 <button
                   type="submit"
                   className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
                   Update
                 </button>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Find more friends{' '}
-                  <Link
-                    to="/users"
-                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  >
-                    click here
-                  </Link>
-                </p>
               </form>
             </div>
           </div>

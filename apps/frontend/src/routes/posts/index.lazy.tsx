@@ -23,7 +23,7 @@ function Page() {
     setTotalPage,
     totalPage,
   } = usePagination()
-  const { data: postsData } = usePosts({ page: currentPage, perPage: 1 })
+  const { data: postsData } = usePosts({ page: currentPage, perPage: PER_PAGE })
   const { data: userProfileData } = useUserProfile()
 
   useEffect(
@@ -63,13 +63,15 @@ function Page() {
           </div>
         </div>
       </section>
-      <Pagination
-        setCurrent={setCurrentPage}
-        next={nextPage}
-        prev={prevPage}
-        curPage={currentPage}
-        totalPage={totalPage}
-      />
+      <div className="pt-8">
+        <Pagination
+          setCurrent={setCurrentPage}
+          next={nextPage}
+          prev={prevPage}
+          curPage={currentPage}
+          totalPage={totalPage}
+        />
+      </div>
     </>
   )
 }

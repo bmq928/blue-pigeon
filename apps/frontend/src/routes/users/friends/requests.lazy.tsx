@@ -22,7 +22,10 @@ function Page() {
     setTotalPage,
     totalPage,
   } = usePagination()
-  const { data: usersData } = useUserFriendsRequests({ page: 1, perPage: 10 })
+  const { data: usersData } = useUserFriendsRequests({
+    page: currentPage,
+    perPage: PER_PAGE,
+  })
   useEffect(
     () => setTotalPage(Math.ceil((usersData?.pageInfo.total || 1) / PER_PAGE)),
     [usersData?.pageInfo.total, setTotalPage],

@@ -204,10 +204,34 @@ export class UsersService {
       .map((id) => new Types.ObjectId(id))
     const friends = await this.userModel
       .find({ _id: { $in: friendIds } })
+      .sort({ [query.sortBy]: query.sort === SortEnum.ASC ? 1 : -1 })
       .lean()
     return {
       data: friends as any,
       pageInfo: { ...query, total: friendRequests.length },
+    }
+  }
+
+  async listFriends(
+    userId: string,
+    query: PaginatedQueryDto,
+  ): Promise<UsersPaginatedResponse> {
+    const { friends } = await this.userModel
+      .findById(
+        userId,
+        {
+          friends: 1,
+        },
+        { populate: 'friends' },
+      )
+      .sort({ [query.sortBy]: query.sort === SortEnum.ASC ? 1 : -1 })
+      .lean()
+    return {
+      data: friends.slice(
+        (query.page - 1) * query.perPage,
+        query.page * query.perPage,
+      ) as any,
+      pageInfo: { ...query, total: friends.length },
     }
   }
 

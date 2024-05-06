@@ -401,6 +401,15 @@ function Page() {
                 </div>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   <Link
+                    to="/users/friends"
+                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                  >
+                    List friends
+                  </Link>
+                  <span>
+                    {'  '}/ {'  '}
+                  </span>
+                  <Link
                     to="/users/friends/available"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                   >

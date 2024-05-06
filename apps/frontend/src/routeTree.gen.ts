@@ -25,6 +25,7 @@ const UsersRegisterLazyImport = createFileRoute('/users/register')()
 const UsersProfileLazyImport = createFileRoute('/users/profile')()
 const UsersLoginLazyImport = createFileRoute('/users/login')()
 const PostsNewLazyImport = createFileRoute('/posts/new')()
+const UsersFriendsIndexLazyImport = createFileRoute('/users/friends/')()
 const UsersFriendsRequestsLazyImport = createFileRoute(
   '/users/friends/requests',
 )()
@@ -72,6 +73,13 @@ const PostsNewLazyRoute = PostsNewLazyImport.update({
   path: '/posts/new',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/posts/new.lazy').then((d) => d.Route))
+
+const UsersFriendsIndexLazyRoute = UsersFriendsIndexLazyImport.update({
+  path: '/users/friends/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/users/friends/index.lazy').then((d) => d.Route),
+)
 
 const UsersFriendsRequestsLazyRoute = UsersFriendsRequestsLazyImport.update({
   path: '/users/friends/requests',
@@ -127,6 +135,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersFriendsRequestsLazyImport
       parentRoute: typeof rootRoute
     }
+    '/users/friends/': {
+      preLoaderRoute: typeof UsersFriendsIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -142,6 +154,7 @@ export const routeTree = rootRoute.addChildren([
   PostsIndexLazyRoute,
   UsersFriendsAvailableLazyRoute,
   UsersFriendsRequestsLazyRoute,
+  UsersFriendsIndexLazyRoute,
 ])
 
 /* prettier-ignore-end */

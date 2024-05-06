@@ -81,14 +81,14 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/friends/requests')
-  requestFriend(
+  @Get('/friends')
+  listFriends(
     @AuthUserId() userId: string,
-    @Body() dto: RequestFriendDto,
-  ): Promise<UserResponse> {
+    @Query() query: PaginatedQueryDto,
+  ): Promise<UsersPaginatedResponse> {
     return this.usersService
-      .requestFriend(userId, dto.friendId)
-      .then((r) => plainToInstance(UserResponse, r))
+      .listFriends(userId, query)
+      .then((r) => plainToInstance(UsersPaginatedResponse, r))
   }
 
   @UseGuards(AuthGuard)
@@ -100,6 +100,17 @@ export class UsersController {
     return this.usersService
       .listFriendRequests(userId, query)
       .then((r) => plainToInstance(UsersPaginatedResponse, r))
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/friends/requests')
+  requestFriend(
+    @AuthUserId() userId: string,
+    @Body() dto: RequestFriendDto,
+  ): Promise<UserResponse> {
+    return this.usersService
+      .requestFriend(userId, dto.friendId)
+      .then((r) => plainToInstance(UserResponse, r))
   }
 
   @UseGuards(AuthGuard)
